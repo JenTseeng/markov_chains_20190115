@@ -16,7 +16,7 @@ def open_and_read_file(file_path):
     return open(file_path).read()
 
 
-def make_chains(text_string):
+def make_chains(text_string, n_gram):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -45,19 +45,22 @@ def make_chains(text_string):
 
     # your code goes here
     word_list = text_string.split()
-    
-    for i in range(len(word_list)-3):
-        key = (word_list[i],word_list[i+1], word_list[i+2])
-        addition = word_list[i+3]
-        if key in chains.keys():
-            chains[key].append(addition)
+
+    for i in range(len(word_list)-n_gram):
+        key = []
+        for n in range(n_gram):
+            key.append(word_list[n+i])
+        key_tuple = tuple(key)
+        addition = word_list[i+n_gram]
+        if key_tuple in chains.keys():
+            chains[key_tuple].append(addition)
             
         else:
-            chains[key] = [addition]
+            chains[key_tuple] = [addition]
     return chains
 
 
-def make_text(chains):
+def make_text(chains, n_gram):
     """Return text from chains."""
 
     words = []
@@ -67,27 +70,31 @@ def make_text(chains):
     words.extend(list(current_key))
 
     count = 0
-    while current_key in chains.keys() and count<2379:
+    while current_key in chains.keys() and count<1000:
         link = choice(chains[current_key]) # generates a string
         #print('current link is: ',link)
         words.append(link)
 
-        current_key = (current_key[1], current_key[2],link)
+        # make current key a list to allow edits
+        current_key = list(current_key)
+        current_key.append(link)
+        current_key = tuple(current_key[1:])
         count += 1
 
     return " ".join(words)
 
 
 input_path = sys.argv[1]
+n_gram = int(sys.argv[2])
 
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text)
+chains = make_chains(input_text, n_gram)
 
 # Produce random text
-random_text = make_text(chains)
+random_text = make_text(chains, n_gram)
 
 print(random_text)
