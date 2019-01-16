@@ -67,10 +67,13 @@ def make_text(chains, n_gram):
 
     current_key = choice(list(chains.keys())) # generates a tuple
     #print('current key is:', current_key)
+    while not current_key[0].isupper():
+        current_key = choice(list(chains.keys()))
+
     words.extend(list(current_key))
 
     count = 0
-    while current_key in chains.keys() and count<1000:
+    while current_key in chains.keys() and count<5000:
         link = choice(chains[current_key]) # generates a string
         #print('current link is: ',link)
         words.append(link)
