@@ -1,6 +1,7 @@
 """Generate Markov text from text files."""
 
 from random import choice
+import sys
 
 
 def open_and_read_file(file_path):
@@ -44,16 +45,15 @@ def make_chains(text_string):
 
     # your code goes here
     word_list = text_string.split()
-
-    for i in range(len(word_list)-2):
-        key = (word_list[i],word_list[i+1])
-        addition = word_list[i+2]
+    
+    for i in range(len(word_list)-3):
+        key = (word_list[i],word_list[i+1], word_list[i+2])
+        addition = word_list[i+3]
         if key in chains.keys():
             chains[key].append(addition)
             
         else:
             chains[key] = [addition]
-            
     return chains
 
 
@@ -63,17 +63,23 @@ def make_text(chains):
     words = []
 
     current_key = choice(list(chains.keys())) # generates a tuple
+    #print('current key is:', current_key)
     words.extend(list(current_key))
-    while current_key in chains.keys():
+
+    count = 0
+    while current_key in chains.keys() and count<2379:
         link = choice(chains[current_key]) # generates a string
+        #print('current link is: ',link)
         words.append(link)
 
-        current_key = (current_key[1], link)
+        current_key = (current_key[1], current_key[2],link)
+        count += 1
 
     return " ".join(words)
 
 
-input_path = "gettysburg.txt"
+input_path = sys.argv[1]
+
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
