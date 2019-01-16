@@ -48,9 +48,12 @@ def make_chains(text_string, n_gram):
 
     for i in range(len(word_list)-n_gram):
         key = []
+        # creating a key of user specified length
         for n in range(n_gram):
             key.append(word_list[n+i])
-        key_tuple = tuple(key)
+        key_tuple = tuple(key) # converts to a tuple to make it immutable
+
+
         addition = word_list[i+n_gram]
         if key_tuple in chains.keys():
             chains[key_tuple].append(addition)
@@ -67,15 +70,23 @@ def make_text(chains, n_gram):
 
     current_key = choice(list(chains.keys())) # generates a tuple
     #print('current key is:', current_key)
+
+    # Checks if the first letter in current key is lowercase it will generate
+    # a new key until it gets a capital letter
+
     while not current_key[0].isupper():
         current_key = choice(list(chains.keys()))
 
     words.extend(list(current_key))
 
+    # keeps track of count to protect against an infinite loop
     count = 0
+
+    punctuation = '!?.'
+    
     while current_key in chains.keys() and count<5000:
-        link = choice(chains[current_key]) # generates a string
-        #print('current link is: ',link)
+        link = choice(chains[current_key]) # selects a value
+        
         words.append(link)
 
         # make current key a list to allow edits
@@ -83,6 +94,9 @@ def make_text(chains, n_gram):
         current_key.append(link)
         current_key = tuple(current_key[1:])
         count += 1
+
+        if link[-1] in punctuation:
+            break
 
     return " ".join(words)
 
